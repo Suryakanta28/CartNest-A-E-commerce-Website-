@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add New Product - CartNest Staff Portal{% endblock %}
+{% block meta_description %}Staff portal to add and publish new products with images, stock inventory, and pricing on CartNest.{% endblock %}
+
+{% block content %}
+<div class="add-product-page">
+  <div class="container">
+    
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+      <ol class="breadcrumb-list">
+        <li><a href="{% url 'store:home' %}">Home</a></li>
+        <li><a href="{% url 'store:product_list' %}">Shop</a></li>
+        <li aria-current="page">Add New Product</li>
+      </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="add-product-header">
+      <div>
+        <div class="staff-badge-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <span>Staff Management</span>
+        </div>
+        <h1 class="add-product-title">Add New Product</h1>
+        <p class="add-product-subtitle">Create a new storefront item with its own unique product image, category, and inventory levels.</p>
+      </div>
+      <div class="header-action-links">
+        <a href="{% url 'admin:store_product_add' %}" target="_blank" class="btn btn-secondary btn-sm" title="Open Django Admin Add Product">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+          <span>Django Admin Form</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Product Creation Form -->
+    <form method="post" enctype="multipart/form-data" class="add-product-form" novalidate id="add-product-form">
+      {% csrf_token %}
+
+      <div class="add-product-grid">
+        
+        <!-- Left Column: Core Product Details -->
+        <div class="form-column-main">
+          
+          <!-- Basic Details Card -->
+          <div class="form-card">
+            <h2 class="form-card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+              <span>Product Information</span>
+            </h2>
+
+            <!-- Product Name -->
+            <div class="form-group {% if form.name.errors %}has-error{% endif %}">
+              <label for="{{ form.name.id_for_label }}" class="form-label">
+                {{ form.name.label }} <span class="required-asterisk">*</span>
+              </label>
+              {{ form.name }}
+              {% if form.name.errors %}
+                <div class="form-error-msg">{{ form.name.errors.0 }}</div>
+              {% endif %}
+              <span class="form-hint">A clear, descriptive title customers will see in catalog search and product cards.</span>
+            </div>
+
+            <!-- Category & Price in 2 Columns -->
+            <div class="form-row-2col">
+              <div class="form-group {% if form.category.errors %}has-error{% endif %}">
+                <label for="{{ form.category.id_for_label }}" class="form-label">
+                  {{ form.category.label }} <span class="required-asterisk">*</span>
+                </label>
+                {{ form.category }}
+                {% if form.category.errors %}
+                  <div class="form-error-msg">{{ form.category.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              <div class="form-group {% if form.price.errors %}has-error{% endif %}">
+                <label for="{{ form.price.id_for_label }}" class="form-label">
+                  {{ form.price.label }} <span class="required-asterisk">*</span>
+                </label>
+                <div class="input-with-prefix">
+                  <span class="input-prefix">₹</span>
+                  {{ form.price }}
+                </div>
+                {% if form.price.errors %}
+                  <div class="form-error-msg">{{ form.price.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group {% if form.description.errors %}has-error{% endif %}">
+              <label for="{{ form.description.id_for_label }}" class="form-label">
+                {{ form.description.label }} <span class="required-asterisk">*</span>
+              </label>
+              {{ form.description }}
+              {% if form.description.errors %}
+                <div class="form-error-msg">{{ form.description.errors.0 }}</div>
+              {% endif %}
+              <span class="form-hint">Highlight key materials, features, dimensions, and specifications.</span>
+            </div>
+          </div>
+
+          <!-- Inventory & Visibility Card -->
+          <div class="form-card">
+            <h2 class="form-card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+              <span>Inventory & Visibility</span>
+            </h2>
+
+            <div class="form-row-2col" style="align-items: center;">
+              <div class="form-group {% if form.stock.errors %}has-error{% endif %}">
+                <label for="{{ form.stock.id_for_label }}" class="form-label">
+                  {{ form.stock.label }} <span class="required-asterisk">*</span>
+                </label>
+                {{ form.stock }}
+                {% if form.stock.errors %}
+                  <div class="form-error-msg">{{ form.stock.errors.0 }}</div>
+                {% endif %}
+                <span class="form-hint">Available quantity in store inventory.</span>
+              </div>
+
+              <div class="form-group checkbox-group">
+                <label class="custom-checkbox-label" for="{{ form.is_active.id_for_label }}">
+                  {{ form.is_active }}
+                  <span class="checkbox-custom-box"></span>
+                  <span class="checkbox-text-wrap">
+                    <span class="checkbox-title">Active on Storefront</span>
+                    <span class="checkbox-desc">When checked, product immediately shows up on Home, Shop, and Category searches.</span>
+                  </span>
+                </label>
+                {% if form.is_active.errors %}
+                  <div class="form-error-msg">{{ form.is_active.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Product Image Upload & Live Preview -->
+        <div class="form-column-side">
+          
+          <div class="form-card sticky-card">
+            <h2 class="form-card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              <span>Product Image</span>
+            </h2>
+
+            <!-- Live Image Preview Box -->
+            <div class="image-preview-container" id="image-preview-box">
+              <img 
+                src="{% static 'images/placeholder.svg' %}" 
+                alt="Image Preview Placeholder" 
+                id="preview-img-element"
+                class="preview-img-display"
+              >
+              <div class="preview-overlay-tag" id="preview-tag">Default Placeholder</div>
+            </div>
+
+            <!-- Upload Dropzone / File Picker -->
+            <div class="file-upload-dropzone" id="file-dropzone">
+              <svg class="upload-cloud-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <div class="upload-instructions">
+                <label for="product-image-upload" class="upload-trigger-btn">Choose an Image</label>
+                <span class="upload-or-text">or drag and drop here</span>
+              </div>
+              <span class="upload-file-types">JPG, PNG, WEBP, AVIF (Max 5MB)</span>
+              {{ form.image }}
+            </div>
+            {% if form.image.errors %}
+              <div class="form-error-msg" style="margin-top: 0.5rem;">{{ form.image.errors.0 }}</div>
+            {% endif %}
+
+            <!-- Selected File Metadata Bar -->
+            <div class="selected-file-info" id="selected-file-info" style="display: none;">
+              <div class="file-name-pill">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span id="selected-file-name">filename.jpg</span>
+              </div>
+              <button type="button" class="btn-clear-image" id="btn-clear-image" title="Clear chosen image">&times;</button>
+            </div>
+
+            <div class="image-upload-tips">
+              <div class="tip-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Every product gets its own dedicated image stored in <code>media/products/</code>.</span>
+              </div>
+              <div class="tip-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>If no image is uploaded, CartNest automatically displays a clean placeholder.</span>
+              </div>
+            </div>
+
+            <!-- Form Action Buttons -->
+            <div class="form-actions-bar">
+              <button type="submit" class="btn btn-primary btn-submit-product">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                <span>Publish Product</span>
+              </button>
+              <a href="{% url 'store:product_list' %}" class="btn btn-secondary btn-cancel">Cancel</a>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<script>
+  // Instant Live Image Preview Handler
+  document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('product-image-upload');
+    const previewImg = document.getElementById('preview-img-element');
+    const previewTag = document.getElementById('preview-tag');
+    const fileInfoBox = document.getElementById('selected-file-info');
+    const fileNameSpan = document.getElementById('selected-file-name');
+    const clearBtn = document.getElementById('btn-clear-image');
+    const dropzone = document.getElementById('file-dropzone');
+    const defaultPlaceholderUrl = "{% static 'images/placeholder.svg' %}";
+
+    if (!fileInput) return;
+
+    fileInput.addEventListener('change', function(e) {
+      handleFiles(this.files);
+    });
+
+    // Drag and Drop support
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzone.addEventListener(eventName, function(e) {
+        e.preventDefault();
+        dropzone.classList.add('drag-over');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, function(e) {
+        e.preventDefault();
+        dropzone.classList.remove('drag-over');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', function(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        handleFiles(files);
+      }
+    });
+
+    function handleFiles(files) {
+      if (files && files[0]) {
+        const file = files[0];
+        
+        // Show file name
+        fileNameSpan.textContent = `${file.name} (${(file.size / (1024*1024)).toFixed(2)} MB)`;
+        fileInfoBox.style.display = 'flex';
+
+        // Render preview
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          previewImg.src = evt.target.result;
+          previewTag.textContent = 'Uploaded Preview';
+          previewTag.style.backgroundColor = 'var(--primary)';
+          previewTag.style.color = '#ffffff';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function() {
+        fileInput.value = '';
+        previewImg.src = defaultPlaceholderUrl;
+        previewTag.textContent = 'Default Placeholder';
+        previewTag.style.backgroundColor = '#e2e8f0';
+        previewTag.style.color = '#475569';
+        fileInfoBox.style.display = 'none';
+      });
+    }
+  });
+</script>
+{% endblock %}

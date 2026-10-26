@@ -1,0 +1,588 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} | Nexus Store{% endblock %}
+{% block meta_description %}{{ product.description|truncatewords:25 }}{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumbs" aria-label="Breadcrumb" style="margin-top: 2rem;">
+    <a href="{% url 'store:home' %}">Home</a>
+    <span>/</span>
+    <a href="{% url 'store:product_list' %}">Shop</a>
+    <span>/</span>
+    <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a>
+    <span>/</span>
+    <span style="color: var(--text-main);">{{ product.name }}</span>
+  </nav>
+
+  <!-- Product Details Layout -->
+  <div class="product-detail-layout">
+
+    <!-- Gallery / Main Product Image & Angle Thumbnails -->
+    <div class="detail-gallery">
+      <div class="detail-main-img" id="detail-main-img-box">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" id="main-product-img">
+
+        <div class="gallery-zoom-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <line x1="11" y1="8" x2="11" y2="14"></line>
+            <line x1="8" y1="11" x2="14" y2="11"></line>
+          </svg>
+          <span>Hover to zoom</span>
+        </div>
+
+        <!-- Active View Badge -->
+        <div class="gallery-view-pill" id="current-view-pill">Main View</div>
+        {% else %}
+        <img src="{% static 'images/placeholder.svg' %}" alt="{{ product.name }}" id="main-product-img" style="object-fit: contain; padding: 2.5rem; background: #f8fafc;">
+        <div class="gallery-view-pill" id="current-view-pill">Placeholder View</div>
+        {% endif %}
+      </div>
+
+      <!-- Multiple Image Angles / Gallery Strip -->
+      {% if product.all_images|length > 1 %}
+      <div class="gallery-thumbnails-strip" aria-label="Product Image Angles">
+        {% for img_item in product.all_images %}
+        <button type="button" class="gallery-thumb-btn {% if forloop.first %}is-active{% endif %}"
+          data-img-url="{{ img_item.url }}" data-label="{{ img_item.label }}" data-alt="{{ img_item.alt }}"
+          title="{{ img_item.label }}" aria-label="Switch to {{ img_item.label }}">
+          <img src="{{ img_item.url }}" alt="{{ img_item.alt }}" loading="lazy">
+          <span class="thumb-label">{{ img_item.label }}</span>
+        </button>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Gallery actions: count + add photo button -->
+      <div style="margin-top: 0.85rem; display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">
+          {{ product.all_images|length }} photo{{ product.all_images|length|pluralize }} available
+        </span>
+        <button type="button" class="btn-add-product-img" id="open-upload-modal-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          <span>+ Add Photo</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Product Purchasing Info -->
+    <div class="detail-info">
+
+      <div style="margin-bottom: 0.5rem;">
+        <a href="{{ product.category.get_absolute_url }}" class="product-category" style="font-size: 0.85rem;">
+          {{ product.category.name }}
+        </a>
+      </div>
+
+      <h1 class="detail-title">{{ product.name }}</h1>
+
+      <div class="detail-price-box">
+        <span class="detail-price">₹{{ product.price }}</span>
+
+        {% if product.stock > 10 %}
+        <span class="detail-status-pill badge-stock">In Stock ({{ product.stock }} units)</span>
+        {% elif product.stock > 0 %}
+        <span class="detail-status-pill badge-low">Low Stock (Only {{ product.stock }} left)</span>
+        {% else %}
+        <span class="detail-status-pill badge-out">Out of Stock</span>
+        {% endif %}
+      </div>
+
+      <div class="detail-description">
+        <p>{{ product.description }}</p>
+      </div>
+
+      <!-- Specs & Guarantee table -->
+      <table class="detail-specs-table">
+        <tbody>
+          <tr>
+            <td>Category</td>
+            <td>{{ product.category.name }}</td>
+          </tr>
+          <tr>
+            <td>Stock Availability</td>
+            <td>
+              {% if product.is_in_stock %}
+              <span style="color: #34d399;">Available to order</span>
+              {% else %}
+              <span style="color: #fb7185;">Currently Unavailable</span>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td>Payment Method</td>
+            <td>Cash on Delivery (Pay upon delivery)</td>
+          </tr>
+          <tr>
+            <td>Dispatch Time</td>
+            <td>Ships in 24 - 48 hours</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Add to Cart Form -->
+      {% if product.is_in_stock %}
+      <form action="{% url 'store:cart_add' product.id %}" method="post" class="add-to-cart-form">
+        {% csrf_token %}
+
+        <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+          <label for="id_quantity"
+            style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Quantity:</label>
+          <div class="quantity-control">
+            <button type="button" class="qty-btn qty-minus" aria-label="Decrease quantity">&minus;</button>
+            <input type="number" name="quantity" id="id_quantity" class="quantity-input" value="1" min="1"
+              max="{{ product.stock }}" required>
+            <button type="button" class="qty-btn qty-plus" aria-label="Increase quantity">&plus;</button>
+          </div>
+        </div>
+
+        <div style="flex: 1; min-width: 200px; display: flex; align-items: flex-end;">
+          <button type="submit" class="btn btn-primary btn-lg btn-block">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <span>Add To Cart</span>
+          </button>
+        </div>
+      </form>
+      {% else %}
+      <div
+        style="padding: 1.25rem; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: var(--radius-md); color: #fb7185;">
+        <strong>Out of Stock:</strong> This item is currently unavailable. Please check back later or browse other
+        related gear.
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- Frequently Bought Together / Add-ons Bundle Section -->
+  {% if addon_products %}
+  <section class="bundle-section" id="bundle-builder">
+    <div class="bundle-header">
+      <div class="bundle-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        <span>Frequently Bought Together</span>
+      </div>
+      <h2 class="bundle-title">Pair &amp; Save: Complete Your Setup</h2>
+      <p class="bundle-subtitle">Customers who view <strong>{{ product.name }}</strong> also pair it with these add-on
+        essentials.</p>
+    </div>
+
+    <form action="{% url 'store:cart_add_bundle' %}" method="post" id="bundle-form">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.path }}">
+
+      <div class="bundle-items-row">
+
+        <!-- Main Product Item -->
+        <div class="bundle-item-card is-active is-main" data-price="{{ product.price }}" data-id="{{ product.id }}">
+          <div class="bundle-check-wrap">
+            <input type="checkbox" class="bundle-checkbox main-checkbox" checked disabled title="Main item is required">
+            <input type="hidden" name="product_ids" value="{{ product.id }}">
+          </div>
+          <div class="bundle-thumb">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+            <div class="no-img">No Image</div>
+            {% endif %}
+            <span class="bundle-pill-main">This Item</span>
+          </div>
+          <div class="bundle-info">
+            <span class="bundle-item-name">{{ product.name }}</span>
+            <div class="bundle-price-stock">
+              <span class="bundle-item-price">₹{{ product.price }}</span>
+              <span class="badge-stock-dot">In Stock</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Addon Products -->
+        {% for addon in addon_products %}
+        <div class="bundle-operator">+</div>
+
+        <div class="bundle-item-card is-active" id="addon-card-{{ addon.id }}" data-price="{{ addon.price }}"
+          data-id="{{ addon.id }}">
+          <div class="bundle-check-wrap">
+            <input type="checkbox" name="product_ids" value="{{ addon.id }}" id="addon-check-{{ addon.id }}"
+              class="bundle-checkbox addon-checkbox" checked aria-label="Include {{ addon.name }} in bundle">
+          </div>
+          <div class="bundle-thumb">
+            {% if addon.image %}
+            <img src="{{ addon.image.url }}" alt="{{ addon.name }}" loading="lazy">
+            {% else %}
+            <div class="no-img">No Image</div>
+            {% endif %}
+          </div>
+          <div class="bundle-info">
+            <a href="{{ addon.get_absolute_url }}" class="bundle-item-name" title="{{ addon.name }}">{{ addon.name
+              }}</a>
+            <div class="bundle-price-stock">
+              <span class="bundle-item-price">₹{{ addon.price }}</span>
+              <span class="badge-stock-dot">In Stock</span>
+            </div>
+            <button type="button" class="btn-quick-add" data-url="{% url 'store:cart_add' addon.id %}"
+              data-name="{{ addon.name }}" title="Add only this item to cart">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>Quick Add</span>
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+
+        <div class="bundle-operator equals">=</div>
+
+        <!-- Bundle Summary Panel -->
+        <div class="bundle-summary-card">
+          <span class="summary-label">Bundle Total</span>
+          <div class="summary-price-wrap">
+            <span class="summary-currency">₹</span>
+            <span class="summary-price" id="bundle-total-display">{{ bundle_total }}</span>
+          </div>
+          <span class="summary-items-count" id="bundle-items-count">For {{ addon_products|length|add:1 }} selected
+            items</span>
+
+          <button type="submit" class="btn btn-primary btn-lg bundle-cta-btn" id="bundle-submit-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <span id="bundle-btn-text">Add Bundle to Cart</span>
+          </button>
+          <span class="bundle-free-shipping">&#10003; Fast Dispatch &amp; Cash on Delivery Available</span>
+        </div>
+
+      </div>
+    </form>
+  </section>
+  {% endif %}
+
+  <!-- Related Products Section (Same Category) -->
+  {% if related_products %}
+  <section class="section" style="border-top: 1px solid var(--border-subtle); margin-top: 2rem;">
+    <div class="section-header">
+      <div>
+        <span class="section-subtitle">More in {{ product.category.name }}</span>
+        <h2>Related Products</h2>
+      </div>
+      <a href="{{ product.category.get_absolute_url }}" class="btn btn-outline btn-sm">
+        <span>View Category</span>
+      </a>
+    </div>
+
+    <div class="product-grid">
+      {% for rel in related_products %}
+      <article class="product-card">
+        <div class="product-img-wrapper">
+          {% if rel.image %}
+          <img src="{{ rel.image.url }}" alt="{{ rel.name }}" class="product-img" loading="lazy">
+          {% else %}
+          <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);">No
+            Image</div>
+          {% endif %}
+        </div>
+
+        <div class="product-content">
+          <span class="product-category">{{ rel.category.name }}</span>
+          <h3 class="product-title">
+            <a href="{{ rel.get_absolute_url }}">{{ rel.name }}</a>
+          </h3>
+          <p class="product-desc-snippet">{{ rel.description }}</p>
+
+          <div class="product-footer">
+            <span class="product-price">₹{{ rel.price }}</span>
+            <a href="{{ rel.get_absolute_url }}" class="btn btn-secondary btn-sm">
+              <span>View Details</span>
+            </a>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Recommended / Trending Gear Section (Cross-Category Discoveries) -->
+  {% if recommended_products %}
+  <section class="section" style="border-top: 1px solid var(--border-subtle); margin-top: 1rem; padding-top: 3rem;">
+    <div class="section-header">
+      <div>
+        <span class="section-subtitle">Trending Gear</span>
+        <h2>Customers Also Explored</h2>
+      </div>
+      <a href="{% url 'store:product_list' %}" class="btn btn-outline btn-sm">
+        <span>Explore All Gear</span>
+      </a>
+    </div>
+
+    <div class="product-grid">
+      {% for rec in recommended_products %}
+      <article class="product-card">
+        <div class="product-img-wrapper">
+          {% if rec.image %}
+          <img src="{{ rec.image.url }}" alt="{{ rec.name }}" class="product-img" loading="lazy">
+          {% else %}
+          <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);">No
+            Image</div>
+          {% endif %}
+        </div>
+
+        <div class="product-content">
+          <span class="product-category">{{ rec.category.name }}</span>
+          <h3 class="product-title">
+            <a href="{{ rec.get_absolute_url }}">{{ rec.name }}</a>
+          </h3>
+          <p class="product-desc-snippet">{{ rec.description }}</p>
+
+          <div class="product-footer">
+            <span class="product-price">₹{{ rec.price }}</span>
+            <a href="{{ rec.get_absolute_url }}" class="btn btn-secondary btn-sm">
+              <span>View Details</span>
+            </a>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+
+<!-- Interactive Dynamic Bundle Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const mainCard = document.querySelector('.bundle-item-card.is-main');
+    const addonCards = document.querySelectorAll('.bundle-item-card:not(.is-main)');
+    const addonCheckboxes = document.querySelectorAll('.addon-checkbox');
+    const totalDisplay = document.getElementById('bundle-total-display');
+    const countDisplay = document.getElementById('bundle-items-count');
+    const btnText = document.getElementById('bundle-btn-text');
+    const submitBtn = document.getElementById('bundle-submit-btn');
+
+    function updateBundleTotal() {
+      if (!mainCard || !totalDisplay) return;
+
+      let total = parseFloat(mainCard.getAttribute('data-price')) || 0;
+      let selectedCount = 1; // main item is always included
+
+      addonCheckboxes.forEach(cb => {
+        const card = cb.closest('.bundle-item-card');
+        const price = parseFloat(card.getAttribute('data-price')) || 0;
+
+        if (cb.checked) {
+          card.classList.add('is-active');
+          total += price;
+          selectedCount += 1;
+        } else {
+          card.classList.remove('is-active');
+        }
+      });
+
+      totalDisplay.textContent = total.toFixed(2);
+      if (countDisplay) {
+        countDisplay.textContent = `For ${selectedCount} selected item${selectedCount > 1 ? 's' : ''}`;
+      }
+
+      if (btnText) {
+        if (selectedCount === 1) {
+          btnText.textContent = 'Add This Item to Cart';
+        } else {
+          btnText.textContent = `Add All ${selectedCount} to Cart`;
+        }
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = selectedCount === 0;
+      }
+    }
+
+    addonCheckboxes.forEach(cb => {
+      cb.addEventListener('change', updateBundleTotal);
+    });
+
+    // Quick Add individual button with asynchronous AJAX fetch
+    const quickAddButtons = document.querySelectorAll('.btn-quick-add');
+    quickAddButtons.forEach(btn => {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const url = this.getAttribute('data-url');
+        const originalHtml = this.innerHTML;
+        this.disabled = true;
+        this.innerHTML = '<span>Adding...</span>';
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+        const formData = new FormData();
+        formData.append('quantity', 1);
+
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrfToken
+          },
+          body: formData
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              this.classList.add('is-added');
+              this.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> <span>Added!</span>';
+
+              // Update navbar cart count
+              const navCount = document.getElementById('nav-cart-count');
+              if (navCount && data.cart_total_items !== undefined) {
+                navCount.textContent = data.cart_total_items;
+                navCount.style.transform = 'scale(1.35)';
+                setTimeout(() => { navCount.style.transform = 'scale(1)'; }, 300);
+              }
+            } else {
+              this.innerHTML = '<span>Failed</span>';
+              this.disabled = false;
+            }
+          })
+          .catch(() => {
+            // Fallback: standard form submit by redirecting
+            window.location.href = url;
+          });
+      });
+    });
+
+    // Image Gallery Thumbnail Switcher
+    const mainProductImg = document.getElementById('main-product-img');
+    const viewPill = document.getElementById('current-view-pill');
+    const galleryThumbBtns = document.querySelectorAll('.gallery-thumb-btn');
+
+    galleryThumbBtns.forEach(btn => {
+      function switchImage() {
+        if (!mainProductImg) return;
+        const newUrl = btn.getAttribute('data-img-url');
+        const newLabel = btn.getAttribute('data-label');
+        const newAlt = btn.getAttribute('data-alt');
+
+        if (mainProductImg.src.endsWith(newUrl) || mainProductImg.getAttribute('src') === newUrl) {
+          return;
+        }
+
+        galleryThumbBtns.forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+
+        mainProductImg.style.opacity = '0.35';
+        mainProductImg.style.transform = 'scale(0.97)';
+        mainProductImg.style.transition = 'all 0.25s ease';
+
+        setTimeout(() => {
+          mainProductImg.src = newUrl;
+          if (newAlt) mainProductImg.alt = newAlt;
+          if (viewPill && newLabel) viewPill.textContent = newLabel;
+
+          mainProductImg.onload = () => {
+            mainProductImg.style.opacity = '1';
+            mainProductImg.style.transform = 'scale(1)';
+          };
+          // fallback in case image is already cached
+          setTimeout(() => {
+            mainProductImg.style.opacity = '1';
+            mainProductImg.style.transform = 'scale(1)';
+          }, 80);
+        }, 150);
+      }
+
+      btn.addEventListener('click', switchImage);
+      btn.addEventListener('mouseenter', switchImage);
+    });
+
+    // Modal for Adding / Uploading Photos
+    const uploadModal = document.getElementById('image-upload-modal');
+    const openModalBtn = document.getElementById('open-upload-modal-btn');
+    const closeModalBtn = document.getElementById('close-upload-modal-btn');
+    const cancelModalBtn = document.getElementById('cancel-upload-btn');
+
+    if (openModalBtn && uploadModal) {
+      openModalBtn.addEventListener('click', () => {
+        uploadModal.style.display = 'flex';
+      });
+      const closeModal = () => { uploadModal.style.display = 'none'; };
+      if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+      if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeModal);
+      uploadModal.addEventListener('click', (e) => {
+        if (e.target === uploadModal) closeModal();
+      });
+    }
+
+    // Initial calculation
+    updateBundleTotal();
+  });
+</script>
+
+<!-- Upload / Add Product Image Modal -->
+<div id="image-upload-modal" class="modal-backdrop" style="display: none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+          <circle cx="12" cy="13" r="4"></circle>
+        </svg>
+        <h3 style="font-size: 1.15rem; color: var(--text-main);">Add Photo for {{ product.name }}</h3>
+      </div>
+      <button type="button" class="modal-close-btn" id="close-upload-modal-btn">&times;</button>
+    </div>
+
+    <form action="{% url 'store:product_add_image' product.slug %}" method="post" enctype="multipart/form-data"
+      class="modal-body">
+      {% csrf_token %}
+      <div class="form-group" style="margin-bottom: 1.25rem;">
+        <label for="id_image_file"
+          style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main);">Select
+          Image File (JPG, PNG, WEBP):</label>
+        <input type="file" name="image" id="id_image_file" accept="image/*" required class="form-control"
+          style="background: var(--bg-surface); padding: 0.65rem; border: 1px dashed var(--border-focus); border-radius: var(--radius-md); width: 100%; color: var(--text-main);">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.25rem;">
+        <label for="id_alt_text"
+          style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main);">Angle
+          / View Label (Optional):</label>
+        <input type="text" name="alt_text" id="id_alt_text" placeholder="e.g. Side Angle, In-Use View, Packaging"
+          class="form-control"
+          style="background: var(--bg-surface); padding: 0.65rem 1rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); width: 100%; color: var(--text-main);">
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+        <input type="checkbox" name="set_as_main" id="id_set_as_main"
+          style="width: 16px; height: 16px; accent-color: var(--primary);">
+        <label for="id_set_as_main" style="font-size: 0.85rem; color: var(--text-secondary); cursor: pointer;">Set as
+          Primary (Main) Product Photo</label>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button type="button" class="btn btn-secondary btn-sm" id="cancel-upload-btn">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Upload &amp; Save Image</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

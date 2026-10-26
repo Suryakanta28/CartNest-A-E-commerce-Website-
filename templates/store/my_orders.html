@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Orders | Nexus Store{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 980px; padding: 2.5rem 1.5rem 5rem;">
+  
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1>My Orders</h1>
+      <p>View and track your previous purchases.</p>
+    </div>
+    <a href="{% url 'store:product_list' %}" class="btn btn-outline btn-sm">
+      <span>Continue Shopping</span>
+    </a>
+  </div>
+
+  {% if orders %}
+    <div class="orders-list">
+      {% for order in orders %}
+        <div class="order-card">
+          <div class="order-header">
+            <div>
+              <span class="order-number">Order #{{ order.order_number }}</span>
+              <span style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-top: 0.2rem;">
+                Placed on {{ order.created_at|date:"F d, Y &bull; h:i A" }}
+              </span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span class="order-status-badge status-{{ order.status|lower }}">
+                {{ order.get_status_display }}
+              </span>
+              <span style="font-size: 1.2rem; font-weight: 800; color: #a5b4fc;">
+                ₹{{ order.total_amount }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Items preview list -->
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; padding-top: 0.5rem;">
+            <div style="font-size: 0.9rem; color: var(--text-secondary);">
+              <strong>{{ order.items.count }} item{{ order.items.count|pluralize }}:</strong>
+              {% for item in order.items.all|slice:":3" %}
+                <span>{{ item.quantity }}x {{ item.product_name }}{% if not forloop.last %}, {% endif %}</span>
+              {% endfor %}
+              {% if order.items.count > 3 %}
+                <span style="color: var(--text-muted);">+{{ order.items.count|add:"-3" }} more</span>
+              {% endif %}
+            </div>
+
+            <a href="{% url 'store:order_detail' order.order_number %}" class="btn btn-secondary btn-sm">
+              <span>View Order Details</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination for orders if applicable -->
+    {% if orders.has_other_pages %}
+      <nav class="pagination">
+        {% if orders.has_previous %}
+          <a href="?page={{ orders.previous_page_number }}" class="page-btn">&laquo; Prev</a>
+        {% endif %}
+        {% for num in orders.paginator.page_range %}
+          {% if orders.number == num %}
+            <span class="page-btn active">{{ num }}</span>
+          {% else %}
+            <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+        {% if orders.has_next %}
+          <a href="?page={{ orders.next_page_number }}" class="page-btn">Next &raquo;</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+
+  {% else %}
+    <!-- Empty Orders State -->
+    <div class="empty-state">
+      <div class="empty-icon">📦</div>
+      <h3>No orders yet</h3>
+      <p>You haven't placed any orders yet. Discover our top-rated gear and make your first purchase.</p>
+      <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg">
+        <span>Explore Catalog</span>
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,371 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CartNest | Everyday Finds. A Little More Delightful.{% endblock %}
+{% block meta_description %}Discover thoughtful essentials for your home, work, and everyday life at CartNest. Quality picks, simple checkout, reliable delivery.{% endblock %}
+
+{% block content %}
+<!-- Hero Section (Two-Column Layout) -->
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-grid">
+      
+      <!-- Hero Left: Content & CTAs -->
+      <div class="hero-left">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          <span class="hero-badge-text">MADE FOR EVERYDAY</span>
+        </div>
+
+        <h1 class="hero-title">
+          Everyday Finds. <br class="hero-title-break">A Little More Delightful.
+        </h1>
+
+        <p class="hero-description">
+          Discover thoughtful essentials for your home, work, and everyday life. Find products you'll love at prices you'll appreciate.
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg hero-btn-primary">
+            <span>Explore Products</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <a href="#categories" class="btn btn-secondary btn-lg hero-btn-secondary">
+            <span>Browse Categories</span>
+          </a>
+        </div>
+
+        <!-- Trust Message Below Buttons -->
+        <div class="hero-trust-message">
+          <div class="trust-msg-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Easy Shopping</span>
+          </div>
+          <span class="trust-msg-sep">&middot;</span>
+          <div class="trust-msg-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Secure Checkout</span>
+          </div>
+          <span class="trust-msg-sep">&middot;</span>
+          <div class="trust-msg-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Reliable Delivery</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Right: Editorial Product Arrangement Visual -->
+      <div class="hero-right">
+        <div class="hero-visual-card">
+          <div class="hero-card-mint-bg">
+            <img 
+              src="{% static 'images/hero-arrangement.jpg' %}" 
+              alt="CartNest curated everyday essentials: headphones, ceramic mug, tote bag, water bottle, notebook, and potted plant"
+              class="hero-arrangement-img"
+              loading="eager"
+            >
+            
+
+            <!-- Decorative corner accent -->
+            <div class="hero-decor-badge">
+              <span>Simple &amp; Timeless</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Trust Benefits Section -->
+<section class="benefits-section">
+  <div class="container">
+    <div class="benefits-grid">
+      
+      <!-- Benefit 1: Quality Picks -->
+      <div class="benefit-card">
+        <div class="benefit-icon-box">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
+        <div class="benefit-content">
+          <h3 class="benefit-title">Quality Picks</h3>
+          <p class="benefit-desc">Products selected for everyday needs.</p>
+        </div>
+      </div>
+
+      <!-- Benefit 2: Simple Checkout -->
+      <div class="benefit-card">
+        <div class="benefit-icon-box">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
+        </div>
+        <div class="benefit-content">
+          <h3 class="benefit-title">Simple Checkout</h3>
+          <p class="benefit-desc">A smooth and convenient shopping experience.</p>
+        </div>
+      </div>
+
+      <!-- Benefit 3: Order Tracking -->
+      <div class="benefit-card">
+        <div class="benefit-icon-box">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13"></rect>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+        </div>
+        <div class="benefit-content">
+          <h3 class="benefit-title">Order Tracking</h3>
+          <p class="benefit-desc">Keep track of your purchases easily.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Popular Categories Section ("Shop by Category") -->
+<section class="section categories-section" id="categories">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-title-wrap">
+        <h2 class="section-title">Shop by Category</h2>
+        <p class="section-subtitle">Find something for every part of your day.</p>
+      </div>
+      <a href="{% url 'store:product_list' %}" class="btn btn-outline btn-sm">
+        <span>View All</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
+    </div>
+
+    <!-- Dynamic Category Grid -->
+    <div class="category-grid">
+      {% for cat in categories %}
+        <a href="{{ cat.get_absolute_url }}" class="category-card" aria-label="Browse {{ cat.name }} products">
+          <div class="category-img-wrapper">
+            {% if cat.image %}
+              <img src="{{ cat.image.url }}" alt="{{ cat.name }}" class="category-card-img" loading="lazy">
+            {% else %}
+              <div class="category-card-placeholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              </div>
+            {% endif %}
+            <div class="category-overlay-gradient"></div>
+          </div>
+          
+          <div class="category-card-content">
+            <h3 class="category-name">{{ cat.name }}</h3>
+            <span class="category-count">{{ cat.product_count }} Item{{ cat.product_count|pluralize }}</span>
+          </div>
+
+          <div class="category-arrow-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </a>
+      {% empty %}
+        <!-- Fallback Cards if DB is empty -->
+        <div class="category-card">
+          <div class="category-card-content">
+            <h3 class="category-name">Electronics</h3>
+            <span class="category-count">Explore Gear</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- Featured Products Section ("Popular Picks") -->
+<section class="section popular-picks-section" id="featured-products">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-title-wrap">
+        <h2 class="section-title">Popular Picks</h2>
+        <p class="section-subtitle">Everyday essentials worth discovering.</p>
+      </div>
+      <a href="{% url 'store:product_list' %}" class="btn btn-outline btn-sm">
+        <span>Explore All</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
+    </div>
+
+    <!-- 4 cards per row on large screens, 2 on tablets, 1-2 on mobile -->
+    <div class="product-grid">
+      {% for product in featured_products %}
+        <article class="product-card" data-product-id="{{ product.id }}">
+          
+          <!-- Image Wrapper with Stock Badge -->
+          <div class="product-img-wrapper">
+            <a href="{{ product.get_absolute_url }}" class="product-img-link" aria-label="{{ product.name }}">
+              {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img" loading="lazy">
+              {% else %}
+                <img src="{% static 'images/placeholder.svg' %}" alt="{{ product.name }}" class="product-img product-img-placeholder" loading="lazy">
+              {% endif %}
+            </a>
+
+            <!-- Stock Availability Badge -->
+            {% if product.stock > 10 %}
+              <span class="product-badge badge-stock">In Stock</span>
+            {% elif product.stock > 0 %}
+              <span class="product-badge badge-low">Only {{ product.stock }} Left</span>
+            {% else %}
+              <span class="product-badge badge-out">Out of Stock</span>
+            {% endif %}
+          </div>
+
+          <!-- Product Details Content -->
+          <div class="product-content">
+            <div class="product-meta-row">
+              <span class="product-category">{{ product.category.name }}</span>
+            </div>
+
+            <h3 class="product-title">
+              <a href="{{ product.get_absolute_url }}" title="{{ product.name }}">{{ product.name }}</a>
+            </h3>
+
+            <!-- Price in Indian Rupees -->
+            <div class="product-price-row">
+              <span class="product-currency">₹</span>
+              <span class="product-price">{{ product.price }}</span>
+            </div>
+
+            <!-- Action Buttons: Add to Cart & View Details -->
+            <div class="product-card-actions">
+              <a href="{{ product.get_absolute_url }}" class="btn btn-secondary btn-sm btn-details" title="View details">
+                <span>Details</span>
+              </a>
+
+              {% if product.is_in_stock %}
+                <form action="{% url 'store:cart_add' product.id %}" method="post" class="add-to-cart-form-ajax">
+                  {% csrf_token %}
+                  <input type="hidden" name="quantity" value="1">
+                  <input type="hidden" name="next" value="{{ request.path }}">
+                  <button type="submit" class="btn btn-primary btn-sm btn-add-cart" aria-label="Add {{ product.name }} to Cart">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>Add to Cart</span>
+                  </button>
+                </form>
+              {% else %}
+                <button type="button" class="btn btn-secondary btn-sm" disabled style="opacity: 0.5; cursor: not-allowed;">
+                  <span>Sold Out</span>
+                </button>
+              {% endif %}
+            </div>
+
+          </div>
+
+        </article>
+      {% empty %}
+        <div style="grid-column: 1 / -1; padding: 3rem; text-align: center; color: var(--text-muted); background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);">
+          <p>No featured products available at this moment. Check back shortly!</p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- View All Products CTA Button Below Grid -->
+    <div class="view-all-container">
+      <a href="{% url 'store:product_list' %}" class="btn btn-outline btn-lg">
+        <span>View All Products</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Promotional Banner Section -->
+<section class="section promo-section">
+  <div class="container">
+    <div class="promo-banner-card">
+      <div class="promo-content">
+        <span class="promo-eyebrow">SIMPLE &amp; DELIGHTFUL</span>
+        <h2 class="promo-heading">Your Next Favorite Find Is Waiting.</h2>
+        <p class="promo-description">
+          Explore useful everyday products and discover something new.
+        </p>
+        <div class="promo-action">
+          <a href="{% url 'store:product_list' %}" class="btn btn-promo btn-lg">
+            <span>Start Shopping</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
+      </div>
+      
+      <div class="promo-decor">
+        <div class="promo-decor-circle circle-1"></div>
+        <div class="promo-decor-circle circle-2"></div>
+        <div class="promo-badge-tag">
+          <span>Thoughtful Living</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About Brand Section (Anchor #about) -->
+<section class="section about-section" id="about">
+  <div class="container">
+    <div class="about-card">
+      <div class="about-grid">
+        <div class="about-text-col">
+          <span class="about-eyebrow">OUR PHILOSOPHY</span>
+          <h2 class="about-heading">Why We Created CartNest</h2>
+          <p class="about-lead">
+            We believe that everyday essentials should feel calm, well-made, and dependable without needless clutter or inflated price tags.
+          </p>
+          <p class="about-body">
+            From the desk tools you reach for every morning to the lifestyle accessories that accompany you on weekend walks, our collection is curated with intention. We focus on items that blend timeless aesthetics with real utility.
+          </p>
+          <div class="about-stats-row">
+            <div class="stat-item">
+              <span class="stat-number">100%</span>
+              <span class="stat-label">Quality Inspected</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">24-48h</span>
+              <span class="stat-label">Dispatch Time</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">COD</span>
+              <span class="stat-label">Pay On Delivery</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="about-quote-col">
+          <div class="quote-box">
+            <svg class="quote-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path></svg>
+            <p class="quote-text">
+              "Shopping shouldn't be overwhelmed by endless low-grade clutter. CartNest exists to give you finds that feel just right."
+            </p>
+            <span class="quote-author">&mdash; The CartNest Team</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

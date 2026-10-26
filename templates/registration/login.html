@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign In | CartNest{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-wrapper">
+    
+    <div class="auth-card">
+      
+      <!-- Brand & Header -->
+      <div class="auth-header">
+        <a href="{% url 'store:home' %}" class="auth-logo-badge" title="CartNest Home">
+          <img src="{% static 'images/cartnest-logo.svg' %}" alt="CartNest Logo" height="34">
+        </a>
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Sign in to your CartNest account to track orders and manage purchases.</p>
+      </div>
+
+      <!-- Segmented Tab Switcher (Sign In / Join) -->
+      <div class="auth-tabs" role="tablist" aria-label="Account Tabs">
+        <a href="{% url 'store:login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="auth-tab active" role="tab" aria-selected="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+          <span>Sign In</span>
+        </a>
+        <a href="{% url 'store:register' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="auth-tab" role="tab" aria-selected="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <line x1="20" y1="8" x2="20" y2="14"></line>
+            <line x1="23" y1="11" x2="17" y2="11"></line>
+          </svg>
+          <span>Join CartNest</span>
+        </a>
+      </div>
+
+      <!-- Interactive Quick Demo Access Box -->
+      <div class="demo-accounts-card">
+        <div class="demo-accounts-top">
+          <div class="demo-accounts-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>Quick Demo Access</span>
+          </div>
+          <span class="demo-hint">Tap an account to auto-fill</span>
+        </div>
+
+        <div class="demo-chips-grid">
+          <button type="button" class="demo-chip-btn" id="btn-fill-customer" data-username="demouser" data-password="demo123" title="Click to autofill Customer credentials">
+            <div class="chip-avatar customer-avatar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <div class="chip-text">
+              <span class="chip-label">Customer</span>
+              <span class="chip-creds">demouser</span>
+            </div>
+            <span class="chip-action">Use</span>
+          </button>
+
+          <button type="button" class="demo-chip-btn" id="btn-fill-admin" data-username="admin" data-password="admin123" title="Click to autofill Administrator credentials">
+            <div class="chip-avatar admin-avatar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <div class="chip-text">
+              <span class="chip-label">Admin</span>
+              <span class="chip-creds">admin</span>
+            </div>
+            <span class="chip-action">Use</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Form Errors -->
+      {% if form.non_field_errors %}
+        <div class="auth-error-banner fade-in">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ form.non_field_errors.0 }}</span>
+        </div>
+      {% endif %}
+
+      <!-- Sign In Form -->
+      <form method="post" action="{% url 'store:login' %}" class="auth-form" id="login-form" novalidate>
+        {% csrf_token %}
+        {% if request.GET.next %}
+          <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
+
+        <!-- Username Field -->
+        <div class="form-group">
+          <label for="{{ form.username.id_for_label }}" class="form-label">
+            <span>Username</span>
+            <span class="label-required">*</span>
+          </label>
+          <div class="input-with-icon">
+            <span class="input-icon-lead">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </span>
+            {{ form.username }}
+          </div>
+          {% if form.username.errors %}
+            <div class="form-error-msg">{{ form.username.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <label for="{{ form.password.id_for_label }}" class="form-label">
+            <span>Password</span>
+            <span class="label-required">*</span>
+          </label>
+          <div class="input-with-icon">
+            <span class="input-icon-lead">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </span>
+            {{ form.password }}
+            <button type="button" class="password-toggle-btn" aria-label="Toggle password visibility" data-target="{{ form.password.id_for_label }}">
+              <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg class="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+            </button>
+          </div>
+          {% if form.password.errors %}
+            <div class="form-error-msg">{{ form.password.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Submit Button -->
+        <div class="auth-action-box">
+          <button type="submit" class="btn btn-auth btn-primary btn-block" id="btn-submit-login">
+            <span>Sign In to CartNest</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </form>
+
+      <!-- Auth Switcher Footer -->
+      <div class="auth-card-footer">
+        <p class="auth-footer-prompt">
+          Don't have an account yet? 
+          <a href="{% url 'store:register' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="auth-footer-link">
+            Join CartNest &rarr;
+          </a>
+        </p>
+
+        <div class="auth-security-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>Encrypted 256-bit SSL connection · Fast &amp; secure</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Autofill Demo Accounts
+  const btnCustomer = document.getElementById('btn-fill-customer');
+  const btnAdmin = document.getElementById('btn-fill-admin');
+  const usernameInput = document.querySelector('input[name="username"]');
+  const passwordInput = document.querySelector('input[name="password"]');
+
+  const fillCredentials = (user, pass, btn) => {
+    if (usernameInput && passwordInput) {
+      usernameInput.value = user;
+      passwordInput.value = pass;
+
+      // Visual flash effect on filled inputs
+      [usernameInput, passwordInput].forEach(inp => {
+        inp.style.borderColor = 'var(--primary)';
+        inp.style.backgroundColor = 'var(--accent-mint)';
+        setTimeout(() => {
+          inp.style.borderColor = '';
+          inp.style.backgroundColor = '';
+        }, 600);
+      });
+
+      // Brief animation on chip button
+      btn.style.transform = 'scale(0.97)';
+      setTimeout(() => { btn.style.transform = ''; }, 150);
+    }
+  };
+
+  if (btnCustomer) {
+    btnCustomer.addEventListener('click', () => fillCredentials('demouser', 'demo123', btnCustomer));
+  }
+  if (btnAdmin) {
+    btnAdmin.addEventListener('click', () => fillCredentials('admin', 'admin123', btnAdmin));
+  }
+
+  // Password Visibility Toggle
+  const toggleButtons = document.querySelectorAll('.password-toggle-btn');
+  toggleButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+      const targetInput = document.getElementById(targetId) || btn.closest('.input-with-icon')?.querySelector('input');
+      const eyeOpen = btn.querySelector('.eye-open');
+      const eyeClosed = btn.querySelector('.eye-closed');
+
+      if (targetInput) {
+        if (targetInput.type === 'password') {
+          targetInput.type = 'text';
+          if (eyeOpen) eyeOpen.style.display = 'none';
+          if (eyeClosed) eyeClosed.style.display = 'block';
+        } else {
+          targetInput.type = 'password';
+          if (eyeOpen) eyeOpen.style.display = 'block';
+          if (eyeClosed) eyeClosed.style.display = 'none';
+        }
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}404 - Page Not Found | Nexus Store{% endblock %}
+
+{% block content %}
+<div class="container" style="min-height: calc(100vh - var(--navbar-height) - 200px); display: flex; align-items: center; justify-content: center; padding: 4rem 1.5rem;">
+  <div style="text-align: center; max-width: 580px; background-color: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 4rem 2.5rem; box-shadow: var(--shadow-lg);">
+    
+    <div style="font-size: 5rem; font-weight: 800; line-height: 1; color: var(--primary); margin-bottom: 1rem; letter-spacing: -0.05em;">
+      404
+    </div>
+
+    <h1 style="font-size: 2rem; margin-bottom: 0.75rem;">Page Not Found</h1>
+    <p style="font-size: 1.05rem; color: var(--text-secondary); margin-bottom: 2rem;">
+      The page or product you were looking for doesn't exist, has been removed, or is temporarily unavailable.
+    </p>
+
+    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+      <a href="{% url 'store:home' %}" class="btn btn-primary btn-lg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <span>Return to Homepage</span>
+      </a>
+      <a href="{% url 'store:product_list' %}" class="btn btn-secondary btn-lg">
+        <span>Browse Products</span>
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

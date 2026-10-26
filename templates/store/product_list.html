@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  {% if category %}{{ category.name }} - {% elif search_query %}Search: "{{ search_query }}" - {% endif %}CartNest Shop
+{% endblock %}
+
+{% block meta_description %}
+  Explore curated everyday essentials at CartNest. Browse {{ category.name|default:'electronics, home living, fashion, and everyday accessories' }} with reliable delivery.
+{% endblock %}
+
+{% block content %}
+<div class="shop-page-wrapper">
+  <div class="container">
+    
+    <!-- Breadcrumb Navigation -->
+    <nav class="shop-breadcrumb" aria-label="Breadcrumb">
+      <a href="{% url 'store:home' %}" class="breadcrumb-link">Home</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="{% url 'store:product_list' %}" class="breadcrumb-link {% if not category and not search_query %}active{% endif %}">Shop</a>
+      {% if category %}
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-current">{{ category.name }}</span>
+      {% elif search_query %}
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-current">Search: &ldquo;{{ search_query }}&rdquo;</span>
+      {% endif %}
+    </nav>
+
+    <!-- Mobile Quick-Select Category Chips (Touch-friendly horizontal scroll) -->
+    <div class="mobile-category-bar" aria-label="Filter categories">
+      <div class="mobile-category-scroll">
+        <a href="{% url 'store:product_list' %}{% if search_query %}?q={{ search_query }}{% endif %}" 
+           class="mobile-cat-pill {% if not category %}active{% endif %}">
+          <span>All Products</span>
+          <span class="pill-badge">{{ total_count }}</span>
+        </a>
+        {% for cat in categories %}
+          <a href="{{ cat.get_absolute_url }}{% if search_query %}?q={{ search_query }}{% endif %}" 
+             class="mobile-cat-pill {% if category and category.slug == cat.slug %}active{% endif %}">
+            <span>{{ cat.name }}</span>
+            <span class="pill-badge">{{ cat.product_count }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Main Two-Column Shop Layout -->
+    <div class="shop-layout">
+      
+      <!-- Left Sidebar: Filters & Guarantees -->
+      <aside class="shop-sidebar">
+        <div class="sidebar-card">
+          
+          <!-- Category Filter Header -->
+          <div class="sidebar-header">
+            <div class="sidebar-title-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <h3 class="sidebar-title">Categories</h3>
+            </div>
+            <span class="sidebar-count-tag">{{ categories|length|add:1 }} Groups</span>
+          </div>
+
+          <!-- Active Filter Pill (When Filtered) -->
+          {% if category or search_query %}
+            <div class="active-filter-banner">
+              <div class="active-filter-info">
+                <span class="active-filter-label">Active:</span>
+                <span class="active-filter-value">{{ category.name|default:search_query }}</span>
+              </div>
+              <a href="{% url 'store:product_list' %}" class="btn-clear-filter" title="Clear filter and view all products">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <span>Clear</span>
+              </a>
+            </div>
+          {% endif %}
+
+          <!-- Structured Categories List -->
+          <ul class="filter-links-list">
+            
+            <!-- All Products Option -->
+            <li class="filter-item">
+              <a href="{% url 'store:product_list' %}{% if search_query %}?q={{ search_query }}{% endif %}" 
+                 class="filter-link-btn {% if not category %}active{% endif %}">
+                <div class="filter-link-left">
+                  <div class="filter-icon-box">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                  </div>
+                  <span class="filter-name">All Products</span>
+                </div>
+                <span class="filter-count-badge">{{ total_count }}</span>
+              </a>
+            </li>
+
+            <!-- Dynamic Category Options -->
+            {% for cat in categories %}
+              <li class="filter-item">
+                <a href="{{ cat.get_absolute_url }}{% if search_query %}?q={{ search_query }}{% endif %}" 
+                   class="filter-link-btn {% if category and category.slug == cat.slug %}active{% endif %}">
+                  <div class="filter-link-left">
+                    <div class="filter-icon-box">
+                      {% if 'elect' in cat.slug %}
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                      {% elif 'home' in cat.slug %}
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                      {% elif 'fash' in cat.slug %}
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>
+                      {% else %}
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                      {% endif %}
+                    </div>
+                    <span class="filter-name">{{ cat.name }}</span>
+                  </div>
+                  <span class="filter-count-badge">{{ cat.product_count }}</span>
+                </a>
+              </li>
+            {% endfor %}
+
+          </ul>
+
+          <!-- Structured Shopping Guarantee Card -->
+          <div class="sidebar-guarantee-box">
+            <div class="guarantee-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              <span>Shopping Guarantee</span>
+            </div>
+
+            <ul class="guarantee-list">
+              <li class="guarantee-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>100% Genuine &amp; Verified</span>
+              </li>
+              <li class="guarantee-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Cash on Delivery at Doorstep</span>
+              </li>
+              <li class="guarantee-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>30-Day Hassle-Free Returns</span>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- Right Column: Product Content & Catalog Area -->
+      <section class="shop-content">
+        
+        <!-- Shop Header & Toolbar -->
+        <div class="shop-toolbar-card">
+          
+          <div class="shop-title-area">
+            <h1 class="shop-main-heading">
+              {% if category %}
+                {{ category.name }}
+              {% elif search_query %}
+                Search Results for &ldquo;{{ search_query }}&rdquo;
+              {% else %}
+                All Products
+              {% endif %}
+            </h1>
+            <p class="shop-meta-count">
+              Showing {{ products.start_index|default:0 }}–{{ products.end_index|default:0 }} of {{ products.paginator.count|default:0 }} items
+              {% if search_query %}
+                &bull; <a href="{% url 'store:product_list' %}" class="clear-search-link">Reset search</a>
+              {% endif %}
+            </p>
+          </div>
+
+          <!-- Modern Sort Selector -->
+          <div class="shop-sort-wrap">
+            <label for="sort-select" class="sort-label">Sort By:</label>
+            <div class="custom-select-wrap">
+              <select id="sort-select" class="sort-select" aria-label="Sort products">
+                <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest Arrivals</option>
+                <option value="price-asc" {% if sort == 'price-asc' %}selected{% endif %}>Price: Low to High</option>
+                <option value="price-desc" {% if sort == 'price-desc' %}selected{% endif %}>Price: High to Low</option>
+                <option value="name" {% if sort == 'name' %}selected{% endif %}>Alphabetical (A-Z)</option>
+              </select>
+              <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Product Cards Grid -->
+        <div class="product-grid">
+          {% for product in products %}
+            <article class="product-card">
+              
+              <div class="product-img-wrapper">
+                <a href="{{ product.get_absolute_url }}" class="product-img-link" aria-label="View {{ product.name }}">
+                  {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img" loading="lazy">
+                  {% else %}
+                    <img src="{% static 'images/placeholder.svg' %}" alt="{{ product.name }}" class="product-img product-img-placeholder" loading="lazy">
+                  {% endif %}
+                </a>
+
+                <!-- Stock Badges -->
+                {% if product.stock > 10 %}
+                  <span class="product-badge badge-stock">In Stock</span>
+                {% elif product.stock > 0 %}
+                  <span class="product-badge badge-low">Only {{ product.stock }} Left</span>
+                {% else %}
+                  <span class="product-badge badge-out">Out of Stock</span>
+                {% endif %}
+              </div>
+
+              <div class="product-content">
+                <span class="product-category">{{ product.category.name }}</span>
+                <h3 class="product-title">
+                  <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+                </h3>
+                <p class="product-desc-snippet">{{ product.description }}</p>
+
+                <div class="product-footer">
+                  <span class="product-price">₹{{ product.price }}</span>
+                  <div class="product-actions">
+                    <a href="{{ product.get_absolute_url }}" class="btn btn-secondary btn-sm" title="View product details">
+                      <span>Details</span>
+                    </a>
+                    {% if product.is_in_stock %}
+                      <form action="{% url 'store:cart_add' product.id %}" method="post" class="add-to-cart-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" value="1">
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <button type="submit" class="btn btn-primary btn-sm btn-quick-cart" title="Add {{ product.name }} to cart">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                          </svg>
+                          <span>Add</span>
+                        </button>
+                      </form>
+                    {% else %}
+                      <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.5; cursor: not-allowed;">Sold Out</button>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+            </article>
+          {% empty %}
+            <div class="empty-state-card" style="grid-column: 1 / -1;">
+              <div class="empty-state-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.8">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+              </div>
+              <h3 class="empty-state-title">No products found</h3>
+              <p class="empty-state-text">We couldn't find any items matching your selected category or search keyword. Try clearing filters or exploring other categories.</p>
+              <a href="{% url 'store:product_list' %}" class="btn btn-primary">
+                <span>View All Products</span>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Pagination Bar -->
+        {% if products.has_other_pages %}
+          <nav class="pagination-bar" aria-label="Catalog navigation">
+            {% if products.has_previous %}
+              <a href="?page={{ products.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="page-link page-nav-arrow" aria-label="Previous page">
+                &larr; Prev
+              </a>
+            {% endif %}
+
+            <div class="page-numbers-wrap">
+              {% for num in products.paginator.page_range %}
+                {% if products.number == num %}
+                  <span class="page-link active" aria-current="page">{{ num }}</span>
+                {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                  <a href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="page-link">{{ num }}</a>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            {% if products.has_next %}
+              <a href="?page={{ products.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="page-link page-nav-arrow" aria-label="Next page">
+                Next &rarr;
+              </a>
+            {% endif %}
+          </nav>
+        {% endif %}
+
+      </section>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
